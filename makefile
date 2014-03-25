@@ -6,7 +6,7 @@ SOURCE = board.cpp
 OBJS = $(SOURCE:.cpp=.o)
 
 board: $(OBJS)
-	$(CC) -o $@ $(OBJS) $(LIBS)
+	$(CC) -o $@ $(OBJS) $(FLAGS)
 
 clean:
 	rm -r *.o && rm board

@@ -3,18 +3,16 @@
 
 #include <stdio.h>
 #include <string>
+#include "reversi.cpp"
 //#include "circle.cpp"
 
 #define MAX 8
 
-const int SCREEN_WIDTH = 400;
-const int SCREEN_HEIGHT = 400;
-
-
 
 bool init();
 
-
+const int SCREEN_WIDTH = 400;
+const int SCREEN_HEIGHT = 400;
 
 SDL_Surface* bSurface = NULL;
 SDL_Window* bWindow = NULL;
@@ -24,8 +22,8 @@ SDL_Texture* black = NULL;
 SDL_Texture* white = NULL;
 
 
-void render(int x, int y, SDL_Texture* texture){
-	SDL_Rect rec = {x, y, 50, 50}; 
+void render(int x, int y, int w, int h, SDL_Texture* texture){
+	SDL_Rect rec = {x, y, w, h}; 
 	SDL_RenderCopy(bRenderer, texture, NULL, &rec);
 }
 
@@ -64,7 +62,6 @@ bool init(){
 
 	return success;
 }
-
 
 
 SDL_Texture* LoadBW(std::string path){
@@ -115,26 +112,27 @@ int main( int argc, char* args[])
 				if (event.type == SDL_QUIT)
 					quit = true;
 			}
-			//SDL_UpdateWindowSurface(bWindow);
 
 			//sort of green 27, 129, 62, 255
 			
 			
+			//draw background color
 			SDL_SetRenderDrawColor(bRenderer, 235, 255, 235, 0);
 			SDL_Rect fullScreen = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 			SDL_RenderFillRect(bRenderer, &fullScreen);
 			
 
 			
-			
+			//Draw Board grid
+			//each grid width = 50, height = 50
 			SDL_SetRenderDrawColor(bRenderer, 0, 0, 0, 240);
 			for (int i = 0; i <= 8; i++)
 			{
 				SDL_RenderDrawLine(bRenderer, i*50, 0, i*50, SCREEN_HEIGHT);
 				SDL_RenderDrawLine(bRenderer, 0, i*50, SCREEN_WIDTH, i*50);
-			}	
+			}
 
-			render(0, 0, black);		
+			render(5, 5, 40, 40, black);		
 			
 			SDL_RenderPresent(bRenderer);
 			

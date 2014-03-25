@@ -1,1 +1,4 @@
 *.sublime*
+test/*
+*.o
+board
