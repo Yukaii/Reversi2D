@@ -73,8 +73,8 @@ SDL_Texture* LoadBW(std::string path){
 
 void LoadMedia()
 {
-	black = LoadBW("circle_b.png");
-	white = LoadBW("circle_w.png");
+	black = LoadBW("res/circle_b.png");
+	white = LoadBW("res/circle_w.png");
 }
 
 
