@@ -9,5 +9,8 @@ reversi: $(OBJS)
 	$(CC) -o $@ $(OBJS) $(FLAGS)
 
 clean:
-	rm -r *.o && rm reversi
+	rm -r *.o && rm reversi cmdtest
+
+test: cmdtest.o
+	g++ cmdtest.cpp -o cmdtest
 
