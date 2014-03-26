@@ -77,9 +77,6 @@ void LoadMedia()
 	white = LoadBW("res/circle_w.png");
 }
 
-
-
-
 void close()
 {
 	SDL_FreeSurface(bSurface);

@@ -1,6 +1,7 @@
-#include "reversi_new.h"
+#include "reversi.h"
 #include <iostream>
 #include <stdlib.h>
+#include <math.h>
 
 using namespace std;
 
@@ -12,7 +13,7 @@ Reversi::Reversi(){
 	{
 		for(int i = 0; i < SIZE; i++)
 		{
-			board[i + j*8] = eEMPTY;
+			setBW(i, j, eEMPTY);
 		}
 	}
 	reset();
@@ -36,7 +37,7 @@ bool Reversi::reset(){
 		}
 	}
 
-	int center = 0 + SIZE/2 - 1;
+	int center = ceil(SIZE/2) - 1;
 	//initialize board status
 	board[center     + center    *SIZE] = eWHITE;
 	board[(center+1) + (center+1)*SIZE] = eWHITE;
@@ -53,12 +54,48 @@ bool Reversi::reset(){
 	index = 0;
 	tale = 0;
 	step = 0;
+	push();
 
 	//end control
 	endflag = false;
 }
 
+//print the board
+void Reversi::print(){
+	cout << endl;
+	for (int j = 0; j < SIZE; j++){		
+		cout << "  ";
+		for (int i = 0; i < SIZE; i++){
+			if (getBW(i, j) == eEMPTY) cout << "- ";
+			if (getBW(i, j) == eBLACK) cout << "x ";
+			if (getBW(i, j) == eWHITE) cout << "o ";
+		}
+		cout << j << endl;
+	}
+	cout << "  ";
+	for (int i = 0; i < SIZE; i++) cout << i << " ";
+	cout << endl << endl;
+	
+	//count black/white on the board again
+	scanBW();
+}
+
+bool Reversi::haveNextMove(){
+	for (int j = 0; j < SIZE; j++){
+		for (int i = 0; i < SIZE; i++){
+			if (getBW(i, j) == eEMPTY)
+			{
+				if (decided(i, j)) return true;
+			}
+		}
+	}
+	return false;
+}
+
+
 bool Reversi::decided(int x, int y){
+	if (getBW(x, y) != eEMPTY) return false;
+	
 	for (int i = 0; i < 9; i++)
 	{
 		mark[i] = 0;
@@ -67,21 +104,20 @@ bool Reversi::decided(int x, int y){
 	int mycolor = eBLACK, oppcolor = eWHITE;
 	if (which == eWHITE)
 	{
-		mycolor = -1;
-		oppcolor = 1;
+		mycolor =  eWHITE;
+		oppcolor = eBLACK;
 	}
-	int i = 0;
 
+	int i = 0;
 	for (int _y = -1; _y <= 1; _y++){
 	for (int _x = -1; _x <= 1; _x++){
-		while(x+_x < SIZE &&  x+_x >= 0 && y＋_y < SIZE && y＋_y >= 0)
+		int next_x = x + _x;
+		int next_y = y + _y;
+		if(next_x < SIZE && next_x >= 0 && next_y < SIZE && next_y >= 0 && getBW(next_x, next_y) == oppcolor)
 		{
-			if (getBW(x+_x, y＋_y) == oppcolor)
+			if (walkaround(next_x, next_y, _x, _y,oppcolor))
 			{
-				if (walkaround(x+_x, y＋_y, _x, _y,oppcolor))
-				{
-					mark[i] = 1;
-				}
+				mark[i] = 1;
 			}
 		}
 		i++;
@@ -96,18 +132,20 @@ bool Reversi::decided(int x, int y){
 
 bool Reversi::walkaround(int x, int y, int _x, int _y,int oppcolor)
 {
-	int mycolor = (-1)＊oppcolor;
+	int mycolor = -oppcolor;
 
 	while(x < SIZE &&  x >= 0 && y < SIZE && y >= 0){
-		if (getBW(x+_x, y＋_y) == mycolor){
+		int next_x = x + _x;
+		int next_y = y + _y;		
+		if (getBW(next_x, next_y) == mycolor){
 			return true;
 		}
-		else if (getBW(x+_x, y＋_y) == oppcolor)
-			return walkaround(x+_x, y＋_y, _x, _y,oppcolor);
-		//empty
-		else break;
+		else if (getBW(next_x, next_y) == oppcolor)
+			return walkaround(next_x, next_y, _x, _y,oppcolor);
+		//if empty
+		else return false;
 	}
-	return false
+	return false;
 }
 
 bool Reversi::placeHere(int x, int y)
@@ -117,7 +155,7 @@ bool Reversi::placeHere(int x, int y)
 	int ori_x = x;
 	int ori_y = y;
 
-	if (decided(x, y) && getBW(x, y) == eEMPTY)
+	if (getBW(x, y) == eEMPTY && decided(x, y))
 	{
 		setBW(x, y, which);
 		
@@ -143,10 +181,12 @@ bool Reversi::placeHere(int x, int y)
 		}	
 		//end for	
 	}
+	else return false;
 
 	flip();
 	push();
 	step++;
+	return true;
 }
 
 void Reversi::scanBW(){

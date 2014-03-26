@@ -10,3 +10,6 @@ board: $(OBJS)
 
 clean:
 	rm -r *.o && rm board
+
+test:
+	

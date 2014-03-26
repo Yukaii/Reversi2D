@@ -1,75 +1,97 @@
 #pragma once
-#define SIZE 8
+#define SIZE 4
 #define MAX 64
-enum eSTATE{eWHITE = -1, eEMPTY = 0, eBLACK = 1};
+const int eWHITE = -1, eEMPTY = 0, eBLACK = 1;
 
 class Reversi
 {
 public:
-	int getWhite(){
-		return numWhite;
-	}
+	/////////////////
+	/// VARIABLES ///
+	/////////////////
 
-	int getBlack(){
-		return numBlack;
-	}
-
-	//reset the board array and variables
-	bool reset();
+	int getWhite(){return numWhite;}
+	int getBlack(){return numBlack;}
 
 	//return now who should place
 	bool BW(){
 		if (which == eBLACK) return true;
-		else return false;
-	}
-	
+			else return false;
+	}	
+
+	//get x, y
+	int getBW(int x, int y){
+		return board[x + y * SIZE];
+	}	
+
+	/////////////////////////
+	/// CONTROL FUNCTIONS ///
+	/////////////////////////
+
 	//place B/W
 	bool placeHere(int x, int y);
 
-	//check if it's end
-	bool isEnd();
+	//check if there's next move
+	bool haveNextMove();
+
+	//activate AI for specific color
+	//return false if the color has been activated
+	bool activateAI(int color);
+
+	//Black to white/ white to Black
+	void flip(){
+		if (which == eBLACK) which = eWHITE;
+		else which = eBLACK;
+	}	
 
 	//other action
-	bool undo();
-	bool redo();
+	void undo();
+	void redo();
+	void print();
+	bool reset();	
 
 	Reversi();
 	~Reversi();
 
 private:
+	////////////////////////////////
+	//    BOARD VAR & ACTIONS    ///
+	////////////////////////////////
+
 	//the number of Black and White
 	int numWhite, numBlack;
 
-	//B/W's turn
-	eSTATE which;
-
-	//B->W, W->B
-	void flip(){
-		if (which == eBLACK) which = eWHITE;
-		else which = eBLACK;
-	}
+	//whose turn, eBLACK or eWHITE
+	int which;
 
 	//decide whether can place B/W
 	bool decided(int x, int y);
 	
+	//go find opposite color recursively
 	bool walkaround(int x, int y, int _x, int _y,int oppcolor);
-	void setaround();
+
+	//set board(x, y) to color(empty/black/white)
 	void setBW(int x, int y, int color){
 		board[x + y * SIZE] = color;
 	}
-	int getBW(int x, int y){
-		return board[x + y * SIZE];
-	}
+	//check if board is empty
 	bool checkZ();
 
-
 	//store board info
-	eSTATE board[SIZE * SIZE];
+	int board[SIZE * SIZE];
 
 	//scan board info
 	void scanBW();
 
+	//////////////////////////
+	///    GAME CONTROL    ///
+	//////////////////////////
+
+	//if endflag equals to true, then the game enter "end mode"
 	bool endflag;
+	int end_count;
+	void AI();
+
 
 	////////////////////////////
 	//        HISTORY         //
