@@ -6,8 +6,6 @@
 #include "reversi.cpp"
 //#include "circle.cpp"
 
-#define MAX 8
-
 
 bool init();
 

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 using namespace std;
 
@@ -56,11 +57,11 @@ bool Reversi::reset(){
 	step = 0;
 	push();
 
-	//end control
-	endflag = false;
+	AIflagB = false;
+	AIflagW = false;
 }
 
-//print the board
+//print the board in command line interface
 void Reversi::print(){
 	cout << endl;
 	for (int j = 0; j < SIZE; j++){		
@@ -79,6 +80,51 @@ void Reversi::print(){
 	//count black/white on the board again
 	scanBW();
 }
+void Reversi::activateAI(int color, bool param){
+	if (param)
+	{
+		if (color == eBLACK) AIflagB = true;
+		if (color == eWHITE) AIflagW = true;
+	}
+	else
+	{
+		if (color == eBLACK) AIflagB = false;
+		if (color == eWHITE) AIflagW = false;		
+	}
+}
+
+bool Reversi::AIMove(){
+	if ((AIflagB == true && which == eBLACK) || (AIflagW == true && which == eWHITE))
+	{
+		srand(time(NULL));
+		
+		int move_number = 0;
+		for(int j = 0; j < SIZE; j++){
+			for (int i = 0; i < SIZE; i++){
+				if(getBW(i, j) == eEMPTY && decided(i, j)) move_number++;
+			}
+		}
+		if (move_number == 0) return false;
+		
+
+
+		//pick up random move
+		int witchcraft = rand()%move_number;
+
+		int k = 0;
+		for(int j = 0; j < SIZE; j++){
+			for (int i = 0; i < SIZE; i++){
+				if(getBW(i, j) == eEMPTY && decided(i, j)) k++;
+				if (k == witchcraft)
+				{
+					if (placeHere(i, j)) return true;
+				}
+			}
+		}
+	}
+	else return false;
+
+}
 
 bool Reversi::haveNextMove(){
 	for (int j = 0; j < SIZE; j++){
@@ -95,7 +141,7 @@ bool Reversi::haveNextMove(){
 
 bool Reversi::decided(int x, int y){
 	if (getBW(x, y) != eEMPTY) return false;
-	
+
 	for (int i = 0; i < 9; i++)
 	{
 		mark[i] = 0;
