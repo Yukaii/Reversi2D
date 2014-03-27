@@ -43,6 +43,10 @@ TTF_Font* gFont = NULL;
 
 SDL_Texture* black = NULL;
 SDL_Texture* white = NULL;
+SDL_Texture* undo  = NULL;
+SDL_Texture* redo  = NULL;
+SDL_Texture* check = NULL;
+SDL_Texture* uncheck = NULL;
 
 SDL_Texture* textureText = NULL;
 int mWidth;
@@ -109,6 +113,10 @@ void LoadMedia()
 {
 	black = LoadImage("res/circle_b.png");
 	white = LoadImage("res/circle_w.png");
+	check = LoadImage("res/checkbox_checked.png");
+	uncheck = LoadImage("res/checkbox_unchecked.png");
+	undo = LoadImage("res/undo.png");
+	redo = LoadImage("res/redo.png");
 }
 
 SDL_Texture* LoadText(std::string textureText, SDL_Color textColor){
@@ -165,8 +173,9 @@ void RenderGrid()
 
 
 void handleEvent(SDL_Event *event){
+	
 	//If mouse event happened
-	if(event->type == SDL_MOUSEBUTTONDOWN || event->type == SDL_MOUSEBUTTONUP )
+	if(event->type == SDL_MOUSEBUTTONUP )
 	{
 		//Get mouse position
 		int x, y;
@@ -187,10 +196,16 @@ void handleEvent(SDL_Event *event){
 
 		}
 		}
+
+		if (x < 310 && x > 280 && y > 410 && y < 430) board.undo();
+		if (x < 365 && x > 335 && y > 410 && y < 430) board.redo();
+		//render(280, 410, 30, 30, undo);
+		//render(335, 410, 30, 30, redo);
+
 	}
 }
 
-void drawFooter(){
+void RenderFooter(){
 	//draw footer
 	SDL_SetRenderDrawColor(gRenderer, 70, 194, 157, 255);
 	SDL_Rect footer = {0, 400, SCREEN_WIDTH, SCREEN_HEIGHT-400};
@@ -208,7 +223,7 @@ void drawFooter(){
 	info = star.str();
 	textureText = LoadText(info, cBlack);
 	if (board.BW()) {
-		render(25, 410, mWidth, mHeight, textureText);
+		render(23, 410, mWidth, mHeight, textureText);
 	}
 
 	info = bbb.str();
@@ -219,7 +234,7 @@ void drawFooter(){
 	info = star.str();
 	textureText = LoadText(info, cBlack);
 	if (!board.BW()) {
-		render(155, 410, mWidth, mHeight, textureText);
+		render(153, 410, mWidth, mHeight, textureText);
 	}	
 
 	info = www.str();
@@ -227,7 +242,15 @@ void drawFooter(){
 	render(170, 410, 30, 30, white);
 	render(210, 410, mWidth, mHeight, textureText);
 
-	
+	render(280, 410, 30, 30, undo);
+	render(335, 410, 30, 30, redo);
+}
+
+void RenderSidebar(){
+	//draw right sidebar #00FE87
+	SDL_SetRenderDrawColor(gRenderer, 70, 194, 157, 255);
+	SDL_Rect Rsidebar = {400, 0, SCREEN_WIDTH-400, SCREEN_HEIGHT};
+	SDL_RenderFillRect(gRenderer, &Rsidebar);
 
 }
 
@@ -272,15 +295,12 @@ int main(int argc, char* args[])
 				SDL_RenderDrawLine(gRenderer, i*50, 0, i*50, SCREEN_HEIGHT);
 				SDL_RenderDrawLine(gRenderer, 0, i*50, SCREEN_WIDTH, i*50);
 			}
-
-			//draw right sidebar #00FE87
-			SDL_SetRenderDrawColor(gRenderer, 70, 194, 157, 255);
-			SDL_Rect Rsidebar = {400, 0, SCREEN_WIDTH-400, SCREEN_HEIGHT};
-			SDL_RenderFillRect(gRenderer, &Rsidebar);
-
-							
+			
 			RenderGrid();
-			drawFooter();
+			
+			RenderSidebar();							
+			
+			RenderFooter();
 
 			SDL_RenderPresent(gRenderer);
 			
