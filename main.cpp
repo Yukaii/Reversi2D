@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <sstream>
 #include "reversi.cpp"
 //#include "LTexture.cpp"
 
@@ -60,7 +61,7 @@ void render(int x, int y, int w, int h, SDL_Texture* texture){
 
 bool init(){
 	bool success = true;
-
+	TTF_Init();
 	gFont = TTF_OpenFont("DroidSans.ttf", 28);
 
 	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
@@ -97,7 +98,7 @@ bool init(){
 }
 
 
-SDL_Texture* LoadBW(std::string path){
+SDL_Texture* LoadImage(std::string path){
 	SDL_Surface *loaded = IMG_Load( path.c_str());
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(gRenderer, loaded);
 	SDL_FreeSurface(loaded);
@@ -106,8 +107,8 @@ SDL_Texture* LoadBW(std::string path){
 
 void LoadMedia()
 {
-	black = LoadBW("res/circle_b.png");
-	white = LoadBW("res/circle_w.png");
+	black = LoadImage("res/circle_b.png");
+	white = LoadImage("res/circle_w.png");
 }
 
 SDL_Texture* LoadText(std::string textureText, SDL_Color textColor){
@@ -195,6 +196,37 @@ void drawFooter(){
 	SDL_Rect footer = {0, 400, SCREEN_WIDTH, SCREEN_HEIGHT-400};
 	SDL_RenderFillRect(gRenderer, &footer);						
 
+	SDL_Color cWhite = {255, 255, 255};
+	SDL_Color cBlack = {0, 0, 0};
+
+	ostringstream bbb, www, star;
+	string info;
+	bbb << ": " << board.getBlack();
+	www << ": " << board.getWhite();
+	star << "*";
+
+	info = star.str();
+	textureText = LoadText(info, cBlack);
+	if (board.BW()) {
+		render(25, 410, mWidth, mHeight, textureText);
+	}
+
+	info = bbb.str();
+	textureText = LoadText(info, cWhite);
+	render(40, 410, 30, 30, black);
+	render(80, 410, mWidth, mHeight, textureText);
+
+	info = star.str();
+	textureText = LoadText(info, cBlack);
+	if (!board.BW()) {
+		render(155, 410, mWidth, mHeight, textureText);
+	}	
+
+	info = www.str();
+	textureText = LoadText(info, cWhite);
+	render(170, 410, 30, 30, white);
+	render(210, 410, mWidth, mHeight, textureText);
+
 	
 
 }
@@ -246,8 +278,9 @@ int main(int argc, char* args[])
 			SDL_Rect Rsidebar = {400, 0, SCREEN_WIDTH-400, SCREEN_HEIGHT};
 			SDL_RenderFillRect(gRenderer, &Rsidebar);
 
-			drawFooter();				
+							
 			RenderGrid();
+			drawFooter();
 
 			SDL_RenderPresent(gRenderer);
 			

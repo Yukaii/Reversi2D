@@ -231,6 +231,7 @@ bool Reversi::placeHere(int x, int y)
 
 	flip();
 	push();
+	scanBW();
 	step++;
 	return true;
 }
@@ -259,6 +260,7 @@ void Reversi::undo(){
 			}
 		}
 		flip();
+		scanBW();
 	}	
 }
 
@@ -273,6 +275,7 @@ void Reversi::redo(){
 			}
 		}
 		flip();
+		scanBW();
 	}
 }
 
