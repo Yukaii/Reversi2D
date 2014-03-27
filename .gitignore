@@ -2,4 +2,5 @@
 test/*
 test2/*
 *.o
-board
+reversi
+cmdtest
