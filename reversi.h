@@ -1,7 +1,7 @@
 #pragma once
 //the width/height of the board
 //must be even number
-#define SIZE 4
+#define SIZE 8
 
 //max trace back steps(history steps remember)
 //smaller than SIZE^2 is fine

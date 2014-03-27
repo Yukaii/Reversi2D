@@ -4,13 +4,12 @@
 #include <stdio.h>
 #include <string>
 #include "reversi.cpp"
-//#include "circle.cpp"
 
 
 bool init();
-
-const int SCREEN_WIDTH = 400;
-const int SCREEN_HEIGHT = 400;
+//grid size = 50 * 50 * 8 * 8 = 400 * 400
+const int SCREEN_WIDTH = 520;
+const int SCREEN_HEIGHT = 450;
 
 SDL_Surface* bSurface = NULL;
 SDL_Window* bWindow = NULL;
@@ -18,6 +17,12 @@ SDL_Renderer* bRenderer = NULL;
 
 SDL_Texture* black = NULL;
 SDL_Texture* white = NULL;
+
+
+/////////////////////////
+/// REVERSI COMPONENT ///
+/////////////////////////
+Reversi board;
 
 
 void render(int x, int y, int w, int h, SDL_Texture* texture){
@@ -86,6 +91,22 @@ void close()
 	SDL_Quit();
 }
 
+void RenderGrid()
+{
+	int x_offset = 5, y_offset = 5;
+	for (int j = 0; j < 8; j++){
+	for (int i = 0; i < 8; i++){
+		int x = i * 400/8;
+		int y = j * 400/8;
+		if (board.getBW(i, j) == eWHITE) render(x+x_offset, y+y_offset, 40, 40, white);
+		if (board.getBW(i, j) == eBLACK) render(x+x_offset, y+y_offset, 40, 40, black);
+	}
+	}
+
+	
+	
+}
+
 
 int main( int argc, char* args[])
 {
@@ -111,24 +132,35 @@ int main( int argc, char* args[])
 			//sort of green 27, 129, 62, 255
 			
 			
-			//draw background color
-			SDL_SetRenderDrawColor(bRenderer, 235, 255, 235, 0);
+			//draw background color 
+			SDL_SetRenderDrawColor(bRenderer, 179, 248, 221, 255);
 			SDL_Rect fullScreen = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 			SDL_RenderFillRect(bRenderer, &fullScreen);
 			
 
 			
 			//Draw Board grid
-			//each grid width = 50, height = 50
-			SDL_SetRenderDrawColor(bRenderer, 0, 0, 0, 240);
+			//each grid width = 50, height = 50 #45C29D
+			SDL_SetRenderDrawColor(bRenderer, 175, 175, 175, 255);
 			for (int i = 0; i <= 8; i++)
 			{
 				SDL_RenderDrawLine(bRenderer, i*50, 0, i*50, SCREEN_HEIGHT);
 				SDL_RenderDrawLine(bRenderer, 0, i*50, SCREEN_WIDTH, i*50);
 			}
 
-			render(5, 5, 40, 40, black);		
+			//draw right sidebar #00FE87
+			SDL_SetRenderDrawColor(bRenderer, 70, 194, 157, 255);
+			SDL_Rect Rsidebar = {400, 0, SCREEN_WIDTH-400, SCREEN_HEIGHT};
+			SDL_RenderFillRect(bRenderer, &Rsidebar);
+
+			//draw footer
+			SDL_SetRenderDrawColor(bRenderer, 70, 194, 157, 255);
+			SDL_Rect footer = {0, 400, SCREEN_WIDTH, SCREEN_HEIGHT-400};
+			SDL_RenderFillRect(bRenderer, &footer);						
+				
 			
+			RenderGrid();
+
 			SDL_RenderPresent(bRenderer);
 			
 			//SDL_UpdateWindowSurface(bWindow);
