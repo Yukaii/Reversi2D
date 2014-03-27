@@ -4,12 +4,34 @@
 #include <stdio.h>
 #include <string>
 #include "reversi.cpp"
+//#include "LTexture.cpp"
 
 
 bool init();
 //grid size = 50 * 50 * 8 * 8 = 400 * 400
 const int SCREEN_WIDTH = 520;
 const int SCREEN_HEIGHT = 450;
+
+//AI toggle bar
+const int TOGGLE_WIDTH = 60;
+const int TOGGLE_HEIGHT = 30;
+
+//disks size
+const int DISK_LEN = 40;
+
+const int GRID_SIZE = 50;
+
+enum DiskSprite
+{
+	DISK_BLACK = 0,
+	DISK_BLACK_TRANSPARENT = 1,
+	DISK_WHITE = 2,
+	DISK_WHITE_TRANSPARENT = 3,
+	DISK_TOTAL = 4
+};
+
+SDL_Rect DiskSpriteClips[DISK_TOTAL];
+//LTexture DiskTexture;
 
 SDL_Surface* bSurface = NULL;
 SDL_Window* bWindow = NULL;
@@ -93,22 +115,46 @@ void close()
 
 void RenderGrid()
 {
-	int x_offset = 5, y_offset = 5;
+	int offset = (GRID_SIZE - DISK_LEN)/2;
 	for (int j = 0; j < 8; j++){
 	for (int i = 0; i < 8; i++){
 		int x = i * 400/8;
 		int y = j * 400/8;
-		if (board.getBW(i, j) == eWHITE) render(x+x_offset, y+y_offset, 40, 40, white);
-		if (board.getBW(i, j) == eBLACK) render(x+x_offset, y+y_offset, 40, 40, black);
+		if (board.getBW(i, j) == eWHITE) render(x+offset, y+offset, DISK_LEN, DISK_LEN, white);
+		if (board.getBW(i, j) == eBLACK) render(x+offset, y+offset, DISK_LEN, DISK_LEN, black);
 	}
-	}
-
-	
-	
+	}	
 }
 
 
-int main( int argc, char* args[])
+void handleEvent(SDL_Event *event){
+	//If mouse event happened
+	if(event->type == SDL_MOUSEBUTTONDOWN || event->type == SDL_MOUSEBUTTONUP )
+	{
+		//Get mouse position
+		int x, y;
+		int grid_region_x,grid_region_y;
+		SDL_GetMouseState( &x, &y );
+
+		for (int j = 0; j < 8; j++){			
+		for (int i = 0; i < 8; i++){
+
+			grid_region_x = i *  GRID_SIZE;
+			grid_region_y = j * GRID_SIZE;
+
+			if (x < grid_region_x + GRID_SIZE && x > grid_region_x 
+			 && y < grid_region_y + GRID_SIZE && y > grid_region_y)
+			{
+				board.placeHere(i, j);	
+			}
+
+		}
+		}
+	}
+}
+
+
+int main(int argc, char* args[])
 {
 	//Start up SDL and create window
 	if( !init() )
@@ -127,6 +173,7 @@ int main( int argc, char* args[])
 			{
 				if (event.type == SDL_QUIT)
 					quit = true;
+				handleEvent(&event);
 			}
 
 			//sort of green 27, 129, 62, 255

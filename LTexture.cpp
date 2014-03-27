@@ -1,33 +1,56 @@
+///////////////////////////////////////////
+// File copy from Lazyfoo's SDL tutorials
+//
+// http://lazyfoo.net/tutorials/SDL/17_mouse_events/index.php
+///////////////////////////////////////////
+
+#include <stdio.h>
+#pragma once
+
 //Texture wrapper class
 class LTexture
 {
-    public:
-        //Initializes variables
-        LTexture();
+	public:
+		//Initializes variables
+		LTexture();
 
-        //Deallocates memory
-        ~LTexture();
+		//Deallocates memory
+		~LTexture();
 
-        //Loads image at specified path
-        bool loadFromFile( std::string path );
+		//Loads image at specified path
+		bool loadFromFile( std::string path );
+		
+		#ifdef _SDL_TTF_H
+		//Creates image from font string
+		bool loadFromRenderedText( std::string textureText, SDL_Color textColor );
+		#endif
+		
+		//Deallocates texture
+		void free();
 
-        //Deallocates texture
-        void free();
+		//Set color modulation
+		void setColor( Uint8 red, Uint8 green, Uint8 blue );
 
-        //Renders texture at given point
-        void render( int x, int y, SDL_Rect* clip = NULL );
+		//Set blending
+		void setBlendMode( SDL_BlendMode blending );
 
-        //Gets image dimensions
-        int getWidth();
-        int getHeight();
+		//Set alpha modulation
+		void setAlpha( Uint8 alpha );
+		
+		//Renders texture at given point
+		void render( int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE );
 
-    private:
-        //The actual hardware texture
-        SDL_Texture* mTexture;
+		//Gets image dimensions
+		int getWidth();
+		int getHeight();
 
-        //Image dimensions
-        int mWidth;
-        int mHeight;
+	private:
+		//The actual hardware texture
+		SDL_Texture* mTexture;
+
+		//Image dimensions
+		int mWidth;
+		int mHeight;
 };
 
 LTexture::LTexture()
@@ -61,7 +84,7 @@ bool LTexture::loadFromFile( std::string path )
 	else
 	{
 		//Color key image
-		//SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
+		SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
 
 		//Create texture from surface pixels
         newTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
@@ -85,6 +108,42 @@ bool LTexture::loadFromFile( std::string path )
 	return mTexture != NULL;
 }
 
+#ifdef _SDL_TTF_H
+bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColor )
+{
+	//Get rid of preexisting texture
+	free();
+
+	//Render text surface
+	SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, textureText.c_str(), textColor );
+	if( textSurface == NULL )
+	{
+		printf( "Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError() );
+	}
+	else
+	{
+		//Create texture from surface pixels
+        mTexture = SDL_CreateTextureFromSurface( gRenderer, textSurface );
+		if( mTexture == NULL )
+		{
+			printf( "Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError() );
+		}
+		else
+		{
+			//Get image dimensions
+			mWidth = textSurface->w;
+			mHeight = textSurface->h;
+		}
+
+		//Get rid of old surface
+		SDL_FreeSurface( textSurface );
+	}
+	
+	//Return success
+	return mTexture != NULL;
+}
+#endif
+
 void LTexture::free()
 {
 	//Free texture if it exists
@@ -97,7 +156,25 @@ void LTexture::free()
 	}
 }
 
-void LTexture::render( int x, int y, SDL_Rect* clip )
+void LTexture::setColor( Uint8 red, Uint8 green, Uint8 blue )
+{
+	//Modulate texture rgb
+	SDL_SetTextureColorMod( mTexture, red, green, blue );
+}
+
+void LTexture::setBlendMode( SDL_BlendMode blending )
+{
+	//Set blending function
+	SDL_SetTextureBlendMode( mTexture, blending );
+}
+		
+void LTexture::setAlpha( Uint8 alpha )
+{
+	//Modulate texture alpha
+	SDL_SetTextureAlphaMod( mTexture, alpha );
+}
+
+void LTexture::render( int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip )
 {
 	//Set rendering space and render to screen
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
@@ -110,7 +187,7 @@ void LTexture::render( int x, int y, SDL_Rect* clip )
 	}
 
 	//Render to screen
-	SDL_RenderCopy( gRenderer, mTexture, clip, &renderQuad );
+	SDL_RenderCopyEx( gRenderer, mTexture, clip, &renderQuad, angle, center, flip );
 }
 
 int LTexture::getWidth()
@@ -122,3 +199,27 @@ int LTexture::getHeight()
 {
 	return mHeight;
 }
+
+//The mouse button
+class LButton
+{
+	public:
+		//Initializes internal variables
+		LButton();
+
+		//Sets top left position
+		void setPosition( int x, int y );
+
+		//Handles mouse event
+		void handleEvent( SDL_Event* e );
+	
+		//Shows button sprite
+		void render();
+
+	private:
+		//Top left position
+		SDL_Point mPosition;
+
+		//Currently used global sprite
+		LButtonSprite mCurrentSprite;
+};
