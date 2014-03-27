@@ -1,4 +1,5 @@
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL.h>
 
 #include <stdio.h>
@@ -33,13 +34,18 @@ enum DiskSprite
 SDL_Rect DiskSpriteClips[DISK_TOTAL];
 //LTexture DiskTexture;
 
-SDL_Surface* bSurface = NULL;
-SDL_Window* bWindow = NULL;
-SDL_Renderer* bRenderer = NULL;
+SDL_Surface* gSurface = NULL;
+SDL_Window* gWindow = NULL;
+SDL_Renderer* gRenderer = NULL;
+
+TTF_Font* gFont = NULL;
 
 SDL_Texture* black = NULL;
 SDL_Texture* white = NULL;
 
+SDL_Texture* textureText = NULL;
+int mWidth;
+int mHeight;
 
 /////////////////////////
 /// REVERSI COMPONENT ///
@@ -49,11 +55,13 @@ Reversi board;
 
 void render(int x, int y, int w, int h, SDL_Texture* texture){
 	SDL_Rect rec = {x, y, w, h}; 
-	SDL_RenderCopy(bRenderer, texture, NULL, &rec);
+	SDL_RenderCopy(gRenderer, texture, NULL, &rec);
 }
 
 bool init(){
 	bool success = true;
+
+	gFont = TTF_OpenFont("DroidSans.ttf", 28);
 
 	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
 	{
@@ -68,19 +76,19 @@ bool init(){
 			printf( "Warning: Linear texture filtering not enabled!" );
 		}		
 
-		bWindow = SDL_CreateWindow("Reversi Board", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-		if( bWindow == NULL )
+		gWindow = SDL_CreateWindow("Reversi Board", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		if( gWindow == NULL )
 		{
 			printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
 			success = false;
 		}
 		else
 		{
-			bRenderer = SDL_CreateRenderer(bWindow, -1, SDL_RENDERER_ACCELERATED);
+			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
 			
-			SDL_SetRenderDrawColor(bRenderer, 255, 255, 255, 255);//rgba
+			SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);//rgba
 
-			bSurface = SDL_GetWindowSurface(bWindow);
+			gSurface = SDL_GetWindowSurface(gWindow);
 		}
 	}
 
@@ -91,7 +99,7 @@ bool init(){
 
 SDL_Texture* LoadBW(std::string path){
 	SDL_Surface *loaded = IMG_Load( path.c_str());
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(bRenderer, loaded);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(gRenderer, loaded);
 	SDL_FreeSurface(loaded);
 	return texture;
 }
@@ -102,13 +110,41 @@ void LoadMedia()
 	white = LoadBW("res/circle_w.png");
 }
 
+SDL_Texture* LoadText(std::string textureText, SDL_Color textColor){
+	SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, textureText.c_str(), textColor );
+	SDL_Texture* temp;
+	if( textSurface == NULL )
+	{
+		printf( "Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError() );
+	}
+	else
+	{
+		//Create texture from surface pixels
+        temp = SDL_CreateTextureFromSurface( gRenderer, textSurface );
+		if( temp == NULL )
+		{
+			printf( "Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError() );
+		}
+		else
+		{
+			//Get image dimensions
+			mWidth = textSurface->w;
+			mHeight = textSurface->h;
+		}
+
+		//Get rid of old surface
+		SDL_FreeSurface( textSurface );
+	}
+	return temp;
+}
+
 void close()
 {
-	SDL_FreeSurface(bSurface);
-	bSurface = NULL;
+	SDL_FreeSurface(gSurface);
+	gSurface = NULL;
 
-	SDL_DestroyWindow(bWindow);
-	bWindow = NULL;
+	SDL_DestroyWindow(gWindow);
+	gWindow = NULL;
 
 	SDL_Quit();
 }
@@ -153,6 +189,16 @@ void handleEvent(SDL_Event *event){
 	}
 }
 
+void drawFooter(){
+	//draw footer
+	SDL_SetRenderDrawColor(gRenderer, 70, 194, 157, 255);
+	SDL_Rect footer = {0, 400, SCREEN_WIDTH, SCREEN_HEIGHT-400};
+	SDL_RenderFillRect(gRenderer, &footer);						
+
+	
+
+}
+
 
 int main(int argc, char* args[])
 {
@@ -180,37 +226,32 @@ int main(int argc, char* args[])
 			
 			
 			//draw background color 
-			SDL_SetRenderDrawColor(bRenderer, 179, 248, 221, 255);
+			SDL_SetRenderDrawColor(gRenderer, 179, 248, 221, 255);
 			SDL_Rect fullScreen = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-			SDL_RenderFillRect(bRenderer, &fullScreen);
+			SDL_RenderFillRect(gRenderer, &fullScreen);
 			
 
 			
 			//Draw Board grid
 			//each grid width = 50, height = 50 #45C29D
-			SDL_SetRenderDrawColor(bRenderer, 175, 175, 175, 255);
+			SDL_SetRenderDrawColor(gRenderer, 175, 175, 175, 255);
 			for (int i = 0; i <= 8; i++)
 			{
-				SDL_RenderDrawLine(bRenderer, i*50, 0, i*50, SCREEN_HEIGHT);
-				SDL_RenderDrawLine(bRenderer, 0, i*50, SCREEN_WIDTH, i*50);
+				SDL_RenderDrawLine(gRenderer, i*50, 0, i*50, SCREEN_HEIGHT);
+				SDL_RenderDrawLine(gRenderer, 0, i*50, SCREEN_WIDTH, i*50);
 			}
 
 			//draw right sidebar #00FE87
-			SDL_SetRenderDrawColor(bRenderer, 70, 194, 157, 255);
+			SDL_SetRenderDrawColor(gRenderer, 70, 194, 157, 255);
 			SDL_Rect Rsidebar = {400, 0, SCREEN_WIDTH-400, SCREEN_HEIGHT};
-			SDL_RenderFillRect(bRenderer, &Rsidebar);
+			SDL_RenderFillRect(gRenderer, &Rsidebar);
 
-			//draw footer
-			SDL_SetRenderDrawColor(bRenderer, 70, 194, 157, 255);
-			SDL_Rect footer = {0, 400, SCREEN_WIDTH, SCREEN_HEIGHT-400};
-			SDL_RenderFillRect(bRenderer, &footer);						
-				
-			
+			drawFooter();				
 			RenderGrid();
 
-			SDL_RenderPresent(bRenderer);
+			SDL_RenderPresent(gRenderer);
 			
-			//SDL_UpdateWindowSurface(bWindow);
+			//SDL_UpdateWindowSurface(gWindow);
 		}
 	}	
 	close();

@@ -12,10 +12,17 @@ Reversi 2D Game - in SDL library
 優雅外觀（自以為）。
 
 ##Eastern Egg
-enter "↑↑↓↓←→←→BA" and see what happen
+enter "↑↑↓↓←→←→BA" and see what happen:
+
+<del>nothing happen</del>
 
 #Installation
 
-#Usage
+#Play
+##Rule
+啊就黑白棋的規則啊，自己查。
+
+##Game Option
+
 
 #Remove
