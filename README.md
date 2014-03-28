@@ -56,7 +56,6 @@ Look up from [here](http://en.wikipedia.org/wiki/Reversi)
 
 #Todo List
 
-*	AI Bug fixes
 *	multiple color scheme
 *	Eastern eggs
 *	About popup
