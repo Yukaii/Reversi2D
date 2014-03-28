@@ -211,13 +211,14 @@ void handleEvent(SDL_Event *event){
 		for (int j = 0; j < 8; j++){			
 		for (int i = 0; i < 8; i++){
 
-			grid_region_x = i *  GRID_SIZE;
+			grid_region_x = i * GRID_SIZE;
 			grid_region_y = j * GRID_SIZE;
 
 			if (x < grid_region_x + GRID_SIZE && x > grid_region_x 
 			 && y < grid_region_y + GRID_SIZE && y > grid_region_y)
 			{
-				board.placeHere(i, j);	
+				if (i < SIZE &&  i >= 0 && j < SIZE && j >= 0)
+					board.placeHere(i, j);	
 			}
 
 		}
@@ -238,10 +239,12 @@ void handleEvent(SDL_Event *event){
 		if (x < 430 && x > 410 && y < 120 && y > 100) {
 			b_AIflag = !b_AIflag;
 			RenderSidebar();
+			//SDL_RenderPresent(gRenderer);
 		}
 		if (x < 430 && x > 410 && y < 150 && y > 120) {
 			w_AIflag = !w_AIflag;
 			RenderSidebar();
+			//SDL_RenderPresent(gRenderer);
 		}
 		//render(410, 100, 20, 20, AI_chk_b);
 		//render(410, 130, 20, 20, AI_chk_w);
@@ -363,7 +366,7 @@ void renderHint(SDL_Event* event){
 			if (x < 400 && x > 0 && y < 400 && y > 0)
 			{
 				if (hint[i][j] == 1)
-				render(hint_x + offset, hint_y + offset, HINT_LEN, HINT_LEN, tHint);
+					render(hint_x + offset, hint_y + offset, HINT_LEN, HINT_LEN, tHint);
 			}
 
 		}
@@ -397,10 +400,16 @@ int main(int argc, char* args[])
 			{
 				if (event.type == SDL_QUIT)
 					quit = true;
-				//else if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_RETURN2){
+				else if (event.key.keysym.sym == SDLK_LEFT && event.type == SDL_KEYUP){
+					board.undo(); 
+					end_flag = false; 
+					once = false;				
 				//	board.reset();
 				//	once = false;
-				//}
+				}
+				else if (event.key.keysym.sym == SDLK_RIGHT && event.type == SDL_KEYUP){
+					board.redo();
+				}
 
 				handleEvent(&event);
 			}

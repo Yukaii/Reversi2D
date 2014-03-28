@@ -26,7 +26,8 @@ public:
 
 	//get x, y
 	int getBW(int x, int y){
-		return board[x + y * SIZE];
+		if (x > SIZE && x < 0 && y > SIZE && y < 0) return 9;
+		else return board[x + y * SIZE];
 	}	
 
 	/////////////////////////

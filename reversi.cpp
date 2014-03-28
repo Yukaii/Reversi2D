@@ -107,18 +107,21 @@ bool Reversi::AIMove(){
 		if (move_number == 0) return false;
 		
 		//pick up random move
-		int witchcraft = rand()%move_number;
+		int witchcraft = rand()%move_number + 1;
 
-		int k = -1;
+		int k = 0;
 		for(int j = 0; j < SIZE; j++){
 		for(int i = 0; i < SIZE; i++){
 
-			if(decided(i, j)) k++;
-			if (k == witchcraft)
-			{
-				if (placeHere(i, j)) return true;
-			}
+			if(decided(i, j)) {
+				k++;
 			
+				if (k == witchcraft)
+				{
+					if (i < SIZE &&  i >= 0 && j < SIZE && j >= 0)
+						if (placeHere(i, j)) return true;
+				}
+			}
 
 		}
 		}
@@ -183,15 +186,18 @@ bool Reversi::walkaround(int x, int y, int _x, int _y,int oppcolor)
 {
 	int mycolor = (-1) * oppcolor;
 
-	while(x < SIZE &&  x >= 0 && y < SIZE && y >= 0){
-		int next_x = x + _x;
-		int next_y = y + _y;		
+	int next_x = x + _x;
+	int next_y = y + _y;
+
+	while(next_x < SIZE &&  next_x >= 0 && next_y < SIZE && next_y >= 0){
+	
 		if (getBW(next_x, next_y) == mycolor){
 			return true;
 		}
 		else if (getBW(next_x, next_y) == oppcolor)
 			return walkaround(next_x, next_y, _x, _y,oppcolor);
 		//if empty
+		else if (getBW(next_x, next_y) == eEMPTY) return false;
 		else return false;
 	}
 	return false;
@@ -204,27 +210,29 @@ bool Reversi::placeHere(int x, int y)
 	int ori_x = x;
 	int ori_y = y;
 
-	if (getBW(x, y) == eEMPTY && decided(x, y))
+	if (decided(x, y) && getBW(x, y) == eEMPTY)
 	{
 		setBW(x, y, which);
 		
 		int i = 0;
 		for (int _y = -1; _y <= 1; _y++){
 		for (int _x = -1; _x <= 1; _x++){
-			x = ori_x;
-			y = ori_y;
+			if (!(_x == 0 && _y == 0)){
+				x = ori_x;
+				y = ori_y;
 
-			if (mark[i] != 0 && !(_x==0 && _y==0)) 
-			{
-				while(getBW(x+_x, y+_y) != mycolor)
+				if (mark[i] == 1 && !(_x==0 && _y==0)) 
 				{
-					setBW(x+_x, y+_y, mycolor);
-					x += _x;
-					y += _y;
-				}	
-				//end while			
+					while(getBW(x+_x, y+_y) != mycolor)
+					{
+						setBW(x+_x, y+_y, mycolor);
+						x += _x;
+						y += _y;
+					}	
+					//end while			
+				}
+				//end if
 			}
-			//end if
 			i++;
 		}
 		}	
