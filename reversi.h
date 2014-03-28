@@ -6,7 +6,7 @@
 //max trace back steps(history steps remember)
 //smaller than SIZE^2 is fine
 #define MAX 64
-const int eWHITE = -1, eEMPTY = 0, eBLACK = 1;
+const int eWHITE = -1, eEMPTY = 2, eBLACK = 1;
 
 class Reversi
 {

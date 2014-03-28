@@ -101,25 +101,26 @@ bool Reversi::AIMove(){
 		int move_number = 0;
 		for(int j = 0; j < SIZE; j++){
 			for (int i = 0; i < SIZE; i++){
-				if(getBW(i, j) == eEMPTY && decided(i, j)) move_number++;
+				if(decided(i, j)) move_number++;
 			}
 		}
 		if (move_number == 0) return false;
 		
-
-
 		//pick up random move
 		int witchcraft = rand()%move_number;
 
-		int k = 0;
+		int k = -1;
 		for(int j = 0; j < SIZE; j++){
-			for (int i = 0; i < SIZE; i++){
-				if(getBW(i, j) == eEMPTY && decided(i, j)) k++;
-				if (k == witchcraft)
-				{
-					if (placeHere(i, j)) return true;
-				}
+		for(int i = 0; i < SIZE; i++){
+
+			if(decided(i, j)) k++;
+			if (k == witchcraft)
+			{
+				if (placeHere(i, j)) return true;
 			}
+			
+
+		}
 		}
 	}
 	else return false;
@@ -235,6 +236,11 @@ bool Reversi::placeHere(int x, int y)
 	push();
 	scanBW();
 	step++;
+	for (int i = 0; i < 9; i++)
+	{
+		mark[i] = 0;
+	}	
+
 	return true;
 }
 
