@@ -66,6 +66,7 @@ SDL_Color cBlack = {0, 0, 0};
 Reversi board;
 
 int hint[SIZE][SIZE];
+bool hint_flag = false;
 
 
 void render(int x, int y, int w, int h, SDL_Texture* texture){
@@ -215,6 +216,9 @@ void handleEvent(SDL_Event *event){
 		//render(280, 410, 30, 30, undo);
 		//render(335, 410, 30, 30, redo);
 
+		if (x < 430 && x > 410 && y < 60 && y > 40) hint_flag = !hint_flag;
+		//render(410, 40, 20, 20, chk);
+
 	}
 }
 
@@ -262,6 +266,15 @@ void RenderSidebar(){
 	SDL_Rect Rsidebar = {400, 0, SCREEN_WIDTH-400, SCREEN_HEIGHT};
 	SDL_RenderFillRect(gRenderer, &Rsidebar);
 
+	SDL_Texture* chk = (hint_flag) ? check : uncheck;
+	render(410, 40, 20, 20, chk);
+
+	ostringstream hint;
+	hint << "HINT";
+	string hnt = hint.str();
+	textureText = LoadText(hnt, cWhite);
+	render(443, 35, mWidth, mHeight, textureText);
+
 }
 
 bool endProcess(){
@@ -274,14 +287,6 @@ bool endProcess(){
 		}
 	}
 	return false;
-}
-
-void setHint(){
-
-}
-
-void resetHint(){
-
 }
 
 void renderHint(SDL_Event* event){
@@ -351,7 +356,6 @@ int main(int argc, char* args[])
 
 			
 			//Draw Board grid
-			//each grid width = 50, height = 50 #45C29D
 			SDL_SetRenderDrawColor(gRenderer, 175, 175, 175, 255);
 			for (int i = 0; i <= 8; i++)
 			{
@@ -388,7 +392,7 @@ int main(int argc, char* args[])
 			}
 			RenderGrid();
 
-			renderHint(&event);
+			if (hint_flag) renderHint(&event);
 
 			SDL_RenderPresent(gRenderer);
 			
