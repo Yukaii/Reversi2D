@@ -41,8 +41,8 @@ int main(int argc, char *argv[]){
 	
 	while(1)
 	{
-		//rev.activateAI(eBLACK, true);
-		//rev.activateAI(eWHITE, true);
+		rev.activateAI(eBLACK, true);
+		rev.activateAI(eWHITE, true);
 		Print();
 
 		if (endProcess())
@@ -59,9 +59,8 @@ int main(int argc, char *argv[]){
 			continue;
 		}
 
-		if (rev.haveNextMove()){
-			if(rev.AIMove()) continue;
-		}
+		if(rev.AIMove()) continue;
+
 
 		cin >> x >> y;
 	

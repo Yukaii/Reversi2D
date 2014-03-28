@@ -280,7 +280,6 @@ void RenderSidebar(){
 bool endProcess(){
 	if (!board.haveNextMove()){
 		board.flip();		
-		//Print();
 
 		if (!board.haveNextMove()){
 			return true;
@@ -323,6 +322,15 @@ void renderHint(SDL_Event* event){
 
 }
 
+void WaitReset(){
+	SDL_Event event;
+	while(SDL_PollEvent(&event) != 0){
+		if (event.type == SDLK_RETURN || event.type == SDLK_RETURN2 || event.type == SDL_QUIT) break;
+		else continue;
+	}
+	board.reset();	
+}
+
 
 int main(int argc, char* args[])
 {
@@ -343,10 +351,13 @@ int main(int argc, char* args[])
 			{
 				if (event.type == SDL_QUIT)
 					quit = true;
+				else if (event.type == SDLK_RETURN || event.type == SDLK_RETURN2)
+					board.reset();
+
 				handleEvent(&event);
 			}
 			//sort of green 27, 129, 62, 255
-			
+
 			
 			//draw background color 
 			SDL_SetRenderDrawColor(gRenderer, 179, 248, 221, 255);
@@ -389,7 +400,24 @@ int main(int argc, char* args[])
 				textureText = LoadText(win, cWhite);
 				render(430, 410, mWidth, mHeight, textureText);
 
+				SDL_RenderPresent(gRenderer);				
+
+				while(SDL_PollEvent(&event) != 0){
+					ostringstream msgg;
+					msgg << "Enter to Continue";
+					string msg = msgg.str();
+					textureText = LoadText(msg, cWhite);
+					render(443, 410, mWidth/2, mHeight/2, textureText);
+					SDL_RenderPresent(gRenderer);
+					WaitReset();				
+				}	
+
 			}
+ 
+			//board.activateAI(eBLACK, true);
+			//board.activateAI(eWHITE, true);
+			//board.AIMove();
+
 			RenderGrid();
 
 			if (hint_flag) renderHint(&event);

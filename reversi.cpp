@@ -94,7 +94,7 @@ void Reversi::activateAI(int color, bool param){
 }
 
 bool Reversi::AIMove(){
-	if ((AIflagB == true && which == eBLACK) || (AIflagW == true && which == eWHITE))
+	if ((AIflagB == true && which == eBLACK) || (AIflagW == true && which == eWHITE) && haveNextMove())
 	{
 		srand(time(NULL));
 		
@@ -129,10 +129,9 @@ bool Reversi::AIMove(){
 bool Reversi::haveNextMove(){
 	for (int j = 0; j < SIZE; j++){
 		for (int i = 0; i < SIZE; i++){
-			if (getBW(i, j) == eEMPTY)
-			{
-				if (decided(i, j)) return true;
-			}
+
+			if (decided(i, j)) return true;
+
 		}
 	}
 	return false;
