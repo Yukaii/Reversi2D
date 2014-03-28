@@ -56,6 +56,9 @@ SDL_Texture* textureText = NULL;
 int mWidth;
 int mHeight;
 
+int reset_w;
+int reset_h;
+
 ////Text color we used
 SDL_Color cWhite = {255, 255, 255};
 SDL_Color cBlack = {0, 0, 0};
@@ -67,6 +70,8 @@ Reversi board;
 
 int hint[SIZE][SIZE];
 bool hint_flag = false;
+bool b_AIflag = false;
+bool w_AIflag = false;
 
 
 void render(int x, int y, int w, int h, SDL_Texture* texture){
@@ -217,7 +222,15 @@ void handleEvent(SDL_Event *event){
 		//render(335, 410, 30, 30, redo);
 
 		if (x < 430 && x > 410 && y < 60 && y > 40) hint_flag = !hint_flag;
-		//render(410, 40, 20, 20, chk);
+		//render(410, 40, 20, 20, hint_chk);
+
+		if (x < 430 && x > 410 && y < 120 && y > 100) b_AIflag = !b_AIflag;
+		if (x < 430 && x > 410 && y < 150 && y > 120) w_AIflag = !w_AIflag;
+		//render(410, 100, 20, 20, AI_chk_b);
+		//render(410, 130, 20, 20, AI_chk_w);
+
+		if (x < 420+reset_w && x > 420 && y < 300+reset_h && y > 300) board.reset();
+		//render(420, 300, mWidth, mHeight, textureText);		
 
 	}
 }
@@ -266,15 +279,35 @@ void RenderSidebar(){
 	SDL_Rect Rsidebar = {400, 0, SCREEN_WIDTH-400, SCREEN_HEIGHT};
 	SDL_RenderFillRect(gRenderer, &Rsidebar);
 
-	SDL_Texture* chk = (hint_flag) ? check : uncheck;
-	render(410, 40, 20, 20, chk);
+	SDL_Texture* hint_chk = (hint_flag) ? check : uncheck;
+	SDL_Texture* AI_chk_b = (b_AIflag)  ? check : uncheck;
+	SDL_Texture* AI_chk_w = (w_AIflag)  ? check : uncheck;
+	render(410, 40, 20, 20, hint_chk);
+	render(410, 100, 20, 20, AI_chk_b);
+	render(440, 100, 20, 20, black);
+	render(410, 130, 20, 20, AI_chk_w);
+	render(440, 130, 20, 20, white);
 
-	ostringstream hint;
+	ostringstream hint, ai;
 	hint << "HINT";
+	ai << "AI";
 	string hnt = hint.str();
+	string aii = ai.str();
+
 	textureText = LoadText(hnt, cWhite);
 	render(443, 35, mWidth, mHeight, textureText);
 
+	textureText = LoadText(aii, cWhite);
+	render(470, 95, mWidth, mHeight, textureText);
+	render(470, 125, mWidth, mHeight, textureText);
+
+	ostringstream msgg;
+	msgg << "RESET";
+	string msg = msgg.str();
+	textureText = LoadText(msg, cWhite);
+	render(420, 300, mWidth, mHeight, textureText);
+	reset_w = mWidth;
+	reset_h = mHeight;
 }
 
 bool endProcess(){
@@ -321,16 +354,6 @@ void renderHint(SDL_Event* event){
 	}	
 
 }
-
-void WaitReset(){
-	SDL_Event event;
-	while(SDL_PollEvent(&event) != 0){
-		if (event.type == SDLK_RETURN || event.type == SDLK_RETURN2 || event.type == SDL_QUIT) break;
-		else continue;
-	}
-	board.reset();	
-}
-
 
 int main(int argc, char* args[])
 {
@@ -403,20 +426,20 @@ int main(int argc, char* args[])
 				SDL_RenderPresent(gRenderer);				
 
 				while(SDL_PollEvent(&event) != 0){
-					ostringstream msgg;
-					msgg << "Enter to Continue";
-					string msg = msgg.str();
-					textureText = LoadText(msg, cWhite);
-					render(443, 410, mWidth/2, mHeight/2, textureText);
-					SDL_RenderPresent(gRenderer);
-					WaitReset();				
+
+					//SDL_RenderPresent(gRenderer);
+					
+					SDL_PollEvent(&event);
+					handleEvent(&event);
+					//if (event.type == SDLK_RETURN || event.type == SDLK_RETURN2 || event.type == SDL_QUIT) break;
+					//else continue;						
 				}	
 
 			}
  
-			//board.activateAI(eBLACK, true);
-			//board.activateAI(eWHITE, true);
-			//board.AIMove();
+			board.activateAI(eBLACK, b_AIflag);
+			board.activateAI(eWHITE, w_AIflag);
+			board.AIMove();
 
 			RenderGrid();
 
