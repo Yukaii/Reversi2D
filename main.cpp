@@ -6,8 +6,6 @@
 #include <string>
 #include <sstream>
 #include "reversi.cpp"
-//#include "LTexture.cpp"
-
 
 bool init();
 //grid size = 50 * 50 * 8 * 8 = 400 * 400
@@ -72,6 +70,14 @@ int hint[SIZE][SIZE];
 bool hint_flag = false;
 bool b_AIflag = false;
 bool w_AIflag = false;
+bool end_flag = false;
+int once = false;
+
+//////////////////////////
+///  FUNCTION DECLARE  ///
+//////////////////////////
+
+void RenderSidebar();
 
 
 void render(int x, int y, int w, int h, SDL_Texture* texture){
@@ -192,7 +198,8 @@ void RenderGrid()
 
 
 void handleEvent(SDL_Event *event){
-	
+
+
 	//If mouse event happened
 	if(event->type == SDL_MOUSEBUTTONUP )
 	{
@@ -216,7 +223,11 @@ void handleEvent(SDL_Event *event){
 		}
 		}
 
-		if (x < 310 && x > 280 && y > 410 && y < 430) board.undo();
+		if (x < 310 && x > 280 && y > 410 && y < 430) {
+			board.undo(); 
+			end_flag = false; 
+			once = false;
+		}
 		if (x < 365 && x > 335 && y > 410 && y < 430) board.redo();
 		//render(280, 410, 30, 30, undo);
 		//render(335, 410, 30, 30, redo);
@@ -224,12 +235,23 @@ void handleEvent(SDL_Event *event){
 		if (x < 430 && x > 410 && y < 60 && y > 40) hint_flag = !hint_flag;
 		//render(410, 40, 20, 20, hint_chk);
 
-		if (x < 430 && x > 410 && y < 120 && y > 100) b_AIflag = !b_AIflag;
-		if (x < 430 && x > 410 && y < 150 && y > 120) w_AIflag = !w_AIflag;
+		if (x < 430 && x > 410 && y < 120 && y > 100) {
+			b_AIflag = !b_AIflag;
+			RenderSidebar();
+		}
+		if (x < 430 && x > 410 && y < 150 && y > 120) {
+			w_AIflag = !w_AIflag;
+			RenderSidebar();
+		}
 		//render(410, 100, 20, 20, AI_chk_b);
 		//render(410, 130, 20, 20, AI_chk_w);
 
-		if (x < 420+reset_w && x > 420 && y < 300+reset_h && y > 300) board.reset();
+		if (x < 420+reset_w && x > 420 && y < 300+reset_h && y > 300) 
+		{
+			board.reset();
+			end_flag = false;
+			once = false;
+		}
 		//render(420, 300, mWidth, mHeight, textureText);		
 
 	}
@@ -315,6 +337,7 @@ bool endProcess(){
 		board.flip();		
 
 		if (!board.haveNextMove()){
+			end_flag = true;
 			return true;
 		}
 	}
@@ -374,13 +397,15 @@ int main(int argc, char* args[])
 			{
 				if (event.type == SDL_QUIT)
 					quit = true;
-				else if (event.type == SDLK_RETURN || event.type == SDLK_RETURN2)
-					board.reset();
+				//else if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_RETURN2){
+				//	board.reset();
+				//	once = false;
+				//}
 
 				handleEvent(&event);
 			}
 			//sort of green 27, 129, 62, 255
-
+			
 			
 			//draw background color 
 			SDL_SetRenderDrawColor(gRenderer, 179, 248, 221, 255);
@@ -409,6 +434,7 @@ int main(int argc, char* args[])
 			///   GAME CONTROL   ///
 			////////////////////////
 			
+
 			if (endProcess())
 			{
 				ostringstream winflag;
@@ -423,29 +449,26 @@ int main(int argc, char* args[])
 				textureText = LoadText(win, cWhite);
 				render(430, 410, mWidth, mHeight, textureText);
 
-				SDL_RenderPresent(gRenderer);				
-
-				while(SDL_PollEvent(&event) != 0){
-
-					//SDL_RenderPresent(gRenderer);
-					
-					SDL_PollEvent(&event);
-					handleEvent(&event);
-					//if (event.type == SDLK_RETURN || event.type == SDLK_RETURN2 || event.type == SDL_QUIT) break;
-					//else continue;						
-				}	
+				if (!once){
+					RenderGrid();				
+					SDL_RenderPresent(gRenderer);				
+					once = true;
+				}
 
 			}
- 
-			board.activateAI(eBLACK, b_AIflag);
-			board.activateAI(eWHITE, w_AIflag);
-			board.AIMove();
 
-			RenderGrid();
+ 			else
+ 			{
+				board.activateAI(eBLACK, b_AIflag);
+				board.activateAI(eWHITE, w_AIflag);
+				board.AIMove();
 
-			if (hint_flag) renderHint(&event);
+				RenderGrid();
 
-			SDL_RenderPresent(gRenderer);
+				if (hint_flag) renderHint(&event);
+
+				SDL_RenderPresent(gRenderer);
+			}
 			
 			//SDL_UpdateWindowSurface(gWindow);
 		}

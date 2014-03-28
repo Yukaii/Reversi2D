@@ -156,16 +156,19 @@ bool Reversi::decided(int x, int y){
 	int i = 0;
 	for (int _y = -1; _y <= 1; _y++){
 	for (int _x = -1; _x <= 1; _x++){
-		int next_x = x + _x;
-		int next_y = y + _y;
-		if(next_x < SIZE && next_x >= 0 && next_y < SIZE && next_y >= 0 && getBW(next_x, next_y) == oppcolor)
-		{
-			if (walkaround(next_x, next_y, _x, _y,oppcolor))
+		if (_x == 0 && _y == 0){}
+		else{
+			int next_x = x + _x;
+			int next_y = y + _y;
+			if(next_x < SIZE && next_x >= 0 && next_y < SIZE && next_y >= 0 && getBW(next_x, next_y) == oppcolor)
 			{
-				mark[i] = 1;
+				if (walkaround(next_x, next_y, _x, _y,oppcolor))
+				{
+					mark[i] = 1;
+				}
 			}
+			i++;
 		}
-		i++;
 	}
 	}
 
@@ -210,7 +213,7 @@ bool Reversi::placeHere(int x, int y)
 			x = ori_x;
 			y = ori_y;
 
-			if (mark[i]!=0)
+			if (mark[i] != 0 && !(_x==0 && _y==0)) 
 			{
 				while(getBW(x+_x, y+_y) != mycolor)
 				{
