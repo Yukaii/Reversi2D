@@ -1,10 +1,13 @@
-Reversi 2D Game - in SDL library
+Reversi 2D Game - in SDL Library
 ================================
 
 #About
-用 SDL 函式庫寫的Reversi(黑白棋)。
+A 2D Reversi Game, using SDL(Simple DirectMedia Layer)
 
-Project Website: [Bitbucket](https://bitbucket.org/yukaihuang1993/reversi-the-game-written-in-sdl-library)
+
+##Project Website: 
+
+Go to [Bitbucket](https://bitbucket.org/yukaihuang1993/reversi-the-game-written-in-sdl-library)
 
 #Preview
 ![GamePlay](https://lh6.googleusercontent.com/-2US_kYp6wgM/UzUf6TGeUSI/AAAAAAAAIuo/8VCPuff78mU/w522-h481-no/1.png)
@@ -18,8 +21,9 @@ Download from [official website](http://www.libsdl.org) and extract *.dll files 
 
 
 #Feature
+
 *	Playable UI
-*	AI（不過有點爛XD)
+*	AI(poor XDD)
 
 
 ##Eastern Egg
@@ -32,6 +36,17 @@ enter "↑↑↓↓←→←→BA" and see what happen:
 ......nothing happen
 
 #Installation
+Download and Setup Develpment Libraries: 
+
+*	[SDL2](http://www.libsdl.org/download-2.0.php)
+*	[SDL2 image](https://www.libsdl.org/projects/SDL_image/)
+*	[SDL2 ttf](https://www.libsdl.org/projects/SDL_ttf/)
+
+use following command for compilation.
+
+	make
+
+
 
 #Play
 
@@ -41,7 +56,7 @@ Look up from [here](http://en.wikipedia.org/wiki/Reversi)
 
 #Todo List
 
-*	修復AI Bug
-*	多種配色主題
-*	彩蛋
-*	about popup
+*	AI Bug fixes
+*	multiple color scheme
+*	Eastern eggs
+*	About popup
