@@ -39,6 +39,9 @@ public:
 	//check if there's next move
 	bool haveNextMove();
 
+	//decide whether can place B/W
+	bool decided(int x, int y);	
+
 	//activate AI for specific color
 	//return false if the color has been activated
 	//param = true:activate, param = false:disactivate
@@ -75,9 +78,6 @@ private:
 
 	bool AIflagB;
 	bool AIflagW;
-
-	//decide whether can place B/W
-	bool decided(int x, int y);
 	
 	//go find opposite color recursively
 	bool walkaround(int x, int y, int _x, int _y,int oppcolor);

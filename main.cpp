@@ -23,6 +23,8 @@ const int DISK_LEN = 40;
 
 const int GRID_SIZE = 50;
 
+const int HINT_LEN = 30;
+
 enum DiskSprite
 {
 	DISK_BLACK = 0,
@@ -47,15 +49,23 @@ SDL_Texture* undo  = NULL;
 SDL_Texture* redo  = NULL;
 SDL_Texture* check = NULL;
 SDL_Texture* uncheck = NULL;
+SDL_Texture* hintb = NULL;
+SDL_Texture* hintw = NULL;
 
 SDL_Texture* textureText = NULL;
 int mWidth;
 int mHeight;
 
+////Text color we used
+SDL_Color cWhite = {255, 255, 255};
+SDL_Color cBlack = {0, 0, 0};
+
 /////////////////////////
 /// REVERSI COMPONENT ///
 /////////////////////////
 Reversi board;
+
+int hint[SIZE][SIZE];
 
 
 void render(int x, int y, int w, int h, SDL_Texture* texture){
@@ -117,6 +127,8 @@ void LoadMedia()
 	uncheck = LoadImage("res/checkbox_unchecked.png");
 	undo = LoadImage("res/undo.png");
 	redo = LoadImage("res/redo.png");
+	hintb = LoadImage("res/hint_b.png");
+	hintw = LoadImage("res/hint_w.png");
 }
 
 SDL_Texture* LoadText(std::string textureText, SDL_Color textColor){
@@ -167,6 +179,7 @@ void RenderGrid()
 		int y = j * 400/8;
 		if (board.getBW(i, j) == eWHITE) render(x+offset, y+offset, DISK_LEN, DISK_LEN, white);
 		if (board.getBW(i, j) == eBLACK) render(x+offset, y+offset, DISK_LEN, DISK_LEN, black);
+	
 	}
 	}	
 }
@@ -211,9 +224,6 @@ void RenderFooter(){
 	SDL_Rect footer = {0, 400, SCREEN_WIDTH, SCREEN_HEIGHT-400};
 	SDL_RenderFillRect(gRenderer, &footer);						
 
-	SDL_Color cWhite = {255, 255, 255};
-	SDL_Color cBlack = {0, 0, 0};
-
 	ostringstream bbb, www, star;
 	string info;
 	bbb << ": " << board.getBlack();
@@ -254,6 +264,60 @@ void RenderSidebar(){
 
 }
 
+bool endProcess(){
+	if (!board.haveNextMove()){
+		board.flip();		
+		//Print();
+
+		if (!board.haveNextMove()){
+			return true;
+		}
+	}
+	return false;
+}
+
+void setHint(){
+
+}
+
+void resetHint(){
+
+}
+
+void renderHint(SDL_Event* event){
+	for(int j = 0; j < 8; j++){
+	for(int i = 0; i < 8; i++){
+		if (board.decided(i, j)) hint[i][j] = 1;
+	}
+	}
+	if (event->type == SDL_MOUSEMOTION){	
+		int x, y;
+		SDL_GetMouseState( &x, &y );	
+		int offset = (GRID_SIZE - HINT_LEN)/2;
+
+		for(int j = 0; j < 8; j++){
+		for(int i = 0; i < 8; i++){	
+			SDL_Texture* tHint = board.BW() ? hintb : hintw;
+			int hint_x = i * 50;
+			int hint_y = j * 50;
+			if (x < 400 && x > 0 && y < 400 && y > 0)
+			{
+				if (hint[i][j] == 1)
+				render(hint_x + offset, hint_y + offset, HINT_LEN, HINT_LEN, tHint);
+			}
+
+		}
+		}
+	}
+
+	for(int j = 0; j < 8; j++){
+	for(int i = 0; i < 8; i++){
+		hint[i][j] = 0;
+	}
+	}	
+
+}
+
 
 int main(int argc, char* args[])
 {
@@ -276,7 +340,6 @@ int main(int argc, char* args[])
 					quit = true;
 				handleEvent(&event);
 			}
-
 			//sort of green 27, 129, 62, 255
 			
 			
@@ -295,12 +358,37 @@ int main(int argc, char* args[])
 				SDL_RenderDrawLine(gRenderer, i*50, 0, i*50, SCREEN_HEIGHT);
 				SDL_RenderDrawLine(gRenderer, 0, i*50, SCREEN_WIDTH, i*50);
 			}
-			
-			RenderGrid();
-			
+
+			//////////////////////////
+			///  RENDER COMPONENT  ///
+			//////////////////////////
+
 			RenderSidebar();							
 			
-			RenderFooter();
+			RenderFooter();			
+
+			////////////////////////
+			///   GAME CONTROL   ///
+			////////////////////////
+			
+			if (endProcess())
+			{
+				ostringstream winflag;
+				SDL_Texture* who = (board.getWhite() < board.getBlack()) ? black : white;
+				if (board.getWhite() == board.getBlack()) who = NULL;
+				render(443, 370, 30, 30, who);
+				//else cout << "tie......!" << endl;
+				if (board.getWhite() != board.getBlack()) winflag << "WIN!";
+													else  winflag << "TIE!";
+
+				string win = winflag.str();
+				textureText = LoadText(win, cWhite);
+				render(430, 410, mWidth, mHeight, textureText);
+
+			}
+			RenderGrid();
+
+			renderHint(&event);
 
 			SDL_RenderPresent(gRenderer);
 			
