@@ -167,8 +167,8 @@ bool Reversi::decided(int x, int y){
 					mark[i] = 1;
 				}
 			}
-			i++;
 		}
+		i++;
 	}
 	}
 
@@ -180,7 +180,7 @@ bool Reversi::decided(int x, int y){
 
 bool Reversi::walkaround(int x, int y, int _x, int _y,int oppcolor)
 {
-	int mycolor = -oppcolor;
+	int mycolor = (-1) * oppcolor;
 
 	while(x < SIZE &&  x >= 0 && y < SIZE && y >= 0){
 		int next_x = x + _x;
