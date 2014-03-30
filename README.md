@@ -19,22 +19,6 @@ Go to [Bitbucket](https://bitbucket.org/yukaihuang1993/reversi-the-game-written-
 
 Download from [official website](http://www.libsdl.org) and extract *.dll files to the game folder.
 
-#Installation
-##Linux
-intall and configure SDL first, then:
-		
-	make
-
-##Windows
-Install MinGW and Setup SDL Develpment Library for mingw.
-
-then Use CMD to compile yourself:
-
-	mingw32-g++ -c main.cpp -o reversi.o
-	mingw32-g++ reversi.o -mwindows -o reversi.exe -lSDL2main -lSDL2_image -lSDL2_ttf -lSDL2
-
-BTW, it's still buggy and memory wastes, but just "playable".
-
 #Feature
 
 *	Playable UI
@@ -51,6 +35,7 @@ enter "↑↑↓↓←→←→BA" and see what happen:
 ......nothing happen
 
 #Installation
+###Linux
 Download and Setup Develpment Libraries: 
 
 *	[SDL2](http://www.libsdl.org/download-2.0.php)
@@ -61,6 +46,15 @@ use following command for compilation.
 
 	make
 
+###Windows
+Install MinGW and Setup SDL Develpment Library for mingw.
+
+then Use CMD to compile yourself:
+
+	mingw32-g++ -c main.cpp -o reversi.o
+	mingw32-g++ reversi.o -mwindows -o reversi.exe -lSDL2main -lSDL2_image -lSDL2_ttf -lSDL2
+
+BTW, it's still buggy and memory wastes, but just "playable".
 
 
 #Play
