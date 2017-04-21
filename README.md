@@ -1,31 +1,31 @@
 Reversi 2D Game - in SDL Library
 ================================
 
-#About
+# About
 A 2D Reversi Game, using SDL(Simple DirectMedia Layer)
 
 
-##Project Website: 
+## Project Website: 
 
 Go to [Bitbucket](https://bitbucket.org/yukaihuang1993/reversi-the-game-written-in-sdl-library)
 
-#Preview
+# Preview
 ![GamePlay](https://lh6.googleusercontent.com/-2US_kYp6wgM/UzUf6TGeUSI/AAAAAAAAIuo/8VCPuff78mU/w522-h481-no/1.png)
 
 ![With Hing](https://lh4.googleusercontent.com/-6UrGrmTQkG8/UzUf6NY3tHI/AAAAAAAAIug/W07h5AJXXHQ/w522-h481-no/2.png)
 
-#Prequisite
+# Prequisite
 *	[SDL2 runtime Library](http://www.libsdl.org/download-2.0.php)
 
 Download from [official website](http://www.libsdl.org) and extract *.dll files to the game folder.
 
-#Feature
+# Feature
 
 *	Playable UI
 *	AI(poor XDD)
 
 
-##Eastern Egg
+## Eastern Egg
 enter "↑↑↓↓←→←→BA" and see what happen:
 
 
@@ -34,8 +34,8 @@ enter "↑↑↓↓←→←→BA" and see what happen:
 
 ......nothing happen
 
-#Installation
-###Linux
+# Installation
+### Linux
 Download and Setup Develpment Libraries: 
 
 *	[SDL2](http://www.libsdl.org/download-2.0.php)
@@ -46,7 +46,7 @@ use following command for compilation.
 
 	make
 
-###Windows
+### Windows
 Install MinGW and Setup SDL Develpment Library for mingw.
 
 then Use CMD to compile yourself:
@@ -57,13 +57,13 @@ then Use CMD to compile yourself:
 BTW, it's still buggy and memory wastes, but just "playable".
 
 
-#Play
+# Play
 
-##Rule
+## Rule
 
 Look up from [here](http://en.wikipedia.org/wiki/Reversi)
 
-#Todo List
+# Todo List
 
 *	multiple color scheme
 *	Eastern eggs
